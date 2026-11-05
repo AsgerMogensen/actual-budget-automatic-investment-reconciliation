@@ -1,0 +1,23 @@
+{
+  "name": "actual-budget-automatic-investment-reconciliation",
+  "version": "0.1.0",
+  "description": "Reconcile Actual Budget investment accounts using Yahoo Finance prices.",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "typecheck": "bun check",
+    "reconcile": "bun run ./src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@actual-app/api": "^26.11.0",
+    "yahoo-finance2": "^4.0.5",
+    "zod": "^4.6.7"
+  }
+}
