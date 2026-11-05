@@ -52,7 +52,7 @@ await Promise.all(
   config.accounts.map(async (account) => {
     const id = account.id;
 
-    const total = account.investments.reduce((total, current) => {
+    const totalInvestments = account.investments.reduce((total, current) => {
       const price = prices.get(current.symbol);
 
       if (price === undefined) {
@@ -62,6 +62,8 @@ await Promise.all(
 
       return total + price * current.quantity;
     }, 0);
+
+    const total = totalInvestments + account.cash;
 
     const balance = balances.get(id);
 

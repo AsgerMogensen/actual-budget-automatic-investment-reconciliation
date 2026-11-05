@@ -21,6 +21,10 @@ const AcountSchema = z.object({
       "Actual Budget account ID. Find it in the URL when the account is selected.",
   }),
   investments: z.array(InvestmentSchema),
+  cash: z
+    .number()
+    .default(0)
+    .meta({ description: "Cash balance for this account." }),
 });
 
 const ActualConfigSchema = z.object({
