@@ -40,6 +40,7 @@ Edit `config.json` with your Actual server connection details, base currency, ac
 | `name`        | string |    No    | Display name for the account.                                                 |
 | `id`          | string |   Yes    | Actual Budget account ID, available in the URL when the account is selected.  |
 | `investments` | array  |   Yes    | Investments held in the account. See [investment configuration](#investments) |
+| `cash`        | number |    No    | Cash balance for the account. Defaults to `0`                                 |
 
 ### Investments
 
