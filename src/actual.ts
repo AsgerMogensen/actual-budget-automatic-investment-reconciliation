@@ -61,6 +61,10 @@ export default class Actual {
     return utils.amountToInteger(amount);
   }
 
+  static integerToAmount(amount: number): number {
+    return utils.integerToAmount(amount);
+  }
+
   async disconnect(): Promise<void> {
     await api.shutdown();
   }
