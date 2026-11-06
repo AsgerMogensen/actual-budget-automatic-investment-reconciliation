@@ -101,9 +101,11 @@ plan.forEach((item) => {
 });
 
 await Promise.all(
-  plan.map((item) =>
-    actual.addTransaction(item.accountId, item.date, item.difference),
-  ),
+  plan
+    .filter((item) => item.difference !== 0)
+    .map((item) =>
+      actual.addTransaction(item.accountId, item.date, item.difference),
+    ),
 );
 
 await actual.disconnect();
