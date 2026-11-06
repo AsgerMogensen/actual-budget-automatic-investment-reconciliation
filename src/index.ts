@@ -23,12 +23,17 @@ const { values } = parseArgs({
       type: "string",
       short: "c",
     },
+    "dry-run": {
+      type: "boolean",
+      default: false,
+    },
   },
   strict: true,
   allowPositionals: true,
 });
 
 const date = values.date;
+const dryRun = values["dry-run"];
 
 if (date === undefined) {
   throw Error("Please provide a date argument");
@@ -100,12 +105,16 @@ plan.forEach((item) => {
   );
 });
 
-await Promise.all(
-  plan
-    .filter((item) => item.difference !== 0)
-    .map((item) =>
-      actual.addTransaction(item.accountId, item.date, item.difference),
-    ),
-);
+if (!dryRun) {
+  await Promise.all(
+    plan
+      .filter((item) => item.difference !== 0)
+      .map((item) =>
+        actual.addTransaction(item.accountId, item.date, item.difference),
+      ),
+  );
+} else {
+  console.info("Dry run: No transactions will be added.");
+}
 
 await actual.disconnect();
