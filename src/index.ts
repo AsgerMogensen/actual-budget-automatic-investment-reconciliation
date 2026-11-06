@@ -3,6 +3,15 @@ import { ConfigSchema } from "./config";
 import Finance from "./finance";
 import Actual from "./actual";
 
+type ReconciliationPlan = {
+  accountId: string;
+  accountName?: string;
+  date: string;
+  target: number;
+  balance: number;
+  difference: number;
+};
+
 const { values } = parseArgs({
   args: Bun.argv,
   options: {
@@ -48,34 +57,53 @@ const actual = await Actual.connect(config.actual);
 
 const balances = await actual.getBalances(accountIds, date);
 
-await Promise.all(
-  config.accounts.map(async (account) => {
-    const id = account.id;
+const plan: ReconciliationPlan[] = config.accounts.map((account) => {
+  const id = account.id;
+  const name = account.name;
 
-    const totalInvestments = account.investments.reduce((total, current) => {
-      const price = prices.get(current.symbol);
+  const totalInvestments = account.investments.reduce((total, current) => {
+    const price = prices.get(current.symbol);
 
-      if (price === undefined) {
-        // Should always be false
-        throw new Error(`Missing price for ${current.symbol}`);
-      }
-
-      return total + price * current.quantity;
-    }, 0);
-
-    const total = totalInvestments + account.cash;
-
-    const balance = balances.get(id);
-
-    if (balance === undefined) {
+    if (price === undefined) {
       // Should always be false
-      throw new Error(`Missing balance for ${id}`);
+      throw new Error(`Missing price for ${current.symbol}`);
     }
 
-    const difference = Actual.amountToInteger(total) - balance;
+    return total + price * current.quantity;
+  }, 0);
 
-    await actual.addTransaction(id, date, difference);
-  }),
+  const target = Actual.amountToInteger(totalInvestments + account.cash);
+  const balance = balances.get(id);
+
+  if (balance === undefined) {
+    // Should always be false
+    throw new Error(`Missing balance for ${id}`);
+  }
+
+  const difference = target - balance;
+
+  return {
+    accountId: id,
+    accountName: name,
+    date,
+    target,
+    balance,
+    difference,
+  };
+});
+
+plan.forEach((item) => {
+  const { accountId, accountName, date, target, balance, difference } = item;
+
+  console.info(
+    `${date} ${accountName ?? accountId}: Target=${Actual.integerToAmount(target)}, Balance=${Actual.integerToAmount(balance)}, Difference=${Actual.integerToAmount(difference)}`,
+  );
+});
+
+await Promise.all(
+  plan.map((item) =>
+    actual.addTransaction(item.accountId, item.date, item.difference),
+  ),
 );
 
 await actual.disconnect();
