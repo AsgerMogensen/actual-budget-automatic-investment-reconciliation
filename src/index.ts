@@ -107,11 +107,9 @@ plan.forEach((item) => {
 
 if (!dryRun) {
   await Promise.all(
-    plan
-      .filter((item) => item.difference !== 0)
-      .map((item) =>
-        actual.addTransaction(item.accountId, item.date, item.difference),
-      ),
+    plan.map((item) =>
+      actual.addTransaction(item.accountId, item.date, item.difference),
+    ),
   );
 } else {
   console.info("Dry run: No transactions will be added.");
