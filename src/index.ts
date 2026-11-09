@@ -60,59 +60,61 @@ const prices = await finance.getPrices(symbols, date);
 
 const actual = await Actual.connect(config.actual);
 
-const balances = await actual.getBalances(accountIds, date);
+try {
+  const balances = await actual.getBalances(accountIds, date);
 
-const plan: ReconciliationPlan[] = config.accounts.map((account) => {
-  const id = account.id;
-  const name = account.name;
+  const plan: ReconciliationPlan[] = config.accounts.map((account) => {
+    const id = account.id;
+    const name = account.name;
 
-  const totalInvestments = account.investments.reduce((total, current) => {
-    const price = prices.get(current.symbol);
+    const totalInvestments = account.investments.reduce((total, current) => {
+      const price = prices.get(current.symbol);
 
-    if (price === undefined) {
+      if (price === undefined) {
+        // Should always be false
+        throw new Error(`Missing price for ${current.symbol}`);
+      }
+
+      return total + price * current.quantity;
+    }, 0);
+
+    const target = Actual.amountToInteger(totalInvestments + account.cash);
+    const balance = balances.get(id);
+
+    if (balance === undefined) {
       // Should always be false
-      throw new Error(`Missing price for ${current.symbol}`);
+      throw new Error(`Missing balance for ${id}`);
     }
 
-    return total + price * current.quantity;
-  }, 0);
+    const difference = target - balance;
 
-  const target = Actual.amountToInteger(totalInvestments + account.cash);
-  const balance = balances.get(id);
+    return {
+      accountId: id,
+      accountName: name,
+      date,
+      target,
+      balance,
+      difference,
+    };
+  });
 
-  if (balance === undefined) {
-    // Should always be false
-    throw new Error(`Missing balance for ${id}`);
+  plan.forEach((item) => {
+    const { accountId, accountName, date, target, balance, difference } = item;
+
+    console.info(
+      `${date} ${accountName ?? accountId}: Target=${Actual.integerToAmount(target)}, Balance=${Actual.integerToAmount(balance)}, Difference=${Actual.integerToAmount(difference)}`,
+    );
+  });
+
+  if (!dryRun) {
+    await Promise.all(
+      plan.map((item) =>
+        actual.addTransaction(item.accountId, item.date, item.difference),
+      ),
+    );
+  } else {
+    console.info("Dry run: No transactions will be added.");
   }
-
-  const difference = target - balance;
-
-  return {
-    accountId: id,
-    accountName: name,
-    date,
-    target,
-    balance,
-    difference,
-  };
-});
-
-plan.forEach((item) => {
-  const { accountId, accountName, date, target, balance, difference } = item;
-
-  console.info(
-    `${date} ${accountName ?? accountId}: Target=${Actual.integerToAmount(target)}, Balance=${Actual.integerToAmount(balance)}, Difference=${Actual.integerToAmount(difference)}`,
-  );
-});
-
-if (!dryRun) {
-  await Promise.all(
-    plan.map((item) =>
-      actual.addTransaction(item.accountId, item.date, item.difference),
-    ),
-  );
-} else {
-  console.info("Dry run: No transactions will be added.");
+} finally {
+  await actual.disconnect();
 }
-
-await actual.disconnect();
