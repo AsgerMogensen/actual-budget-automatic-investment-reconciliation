@@ -47,7 +47,7 @@ const ActualConfigSchema = z.object({
     .meta({ description: "Notes added to reconciliation transactions." }),
   category: z.string().optional().meta({
     description:
-      "Category ID to assign to reconciliation transactions. Use the provided script to find category IDs.",
+      "Category ID to assign to reconciliation transactions. Use the provided helper script to find category IDs.",
   }),
 });
 export type ActualConfig = z.infer<typeof ActualConfigSchema>;

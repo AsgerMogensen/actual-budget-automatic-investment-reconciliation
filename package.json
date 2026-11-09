@@ -7,7 +7,8 @@
   "type": "module",
   "scripts": {
     "typecheck": "bun check",
-    "reconcile": "bun run ./src/index.ts"
+    "reconcile": "bun run ./src/index.ts",
+    "categories": "bun run ./src/helpers/getCategories.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"

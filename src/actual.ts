@@ -57,6 +57,10 @@ export default class Actual {
     await api.addTransactions(account, [transaction]);
   }
 
+  async getCategories() {
+    return await api.getCategories();
+  }
+
   static amountToInteger(amount: number): number {
     return utils.amountToInteger(amount);
   }

@@ -24,14 +24,14 @@ Edit `config.json` with your Actual server connection details, base currency, ac
 
 ### Actual Budget
 
-| Field       | Type   | Required | Description                                                                           |
-| ----------- | ------ | :------: | ------------------------------------------------------------------------------------- |
-| `dataDir`   | string |    No    | Directory for locally cached budget files. Defaults to `./cache`.                     |
-| `syncId`    | string |   Yes    | Actual Budget sync ID, found under **Settings → Show advanced settings → Sync ID**.   |
-| `serverUrl` | URL    |   Yes    | URL of your Actual Budget server.                                                     |
-| `password`  | string |   Yes    | Actual Budget server password.                                                        |
-| `notes`     | string |    No    | Notes to add to reconciliation transactions.                                          |
-| `category`  | string |    No    | Category ID to assign to reconciliation transactions. Get them via the Actual NPM API |
+| Field       | Type   | Required | Description                                                                                               |
+| ----------- | ------ | :------: | --------------------------------------------------------------------------------------------------------- |
+| `dataDir`   | string |    No    | Directory for locally cached budget files. Defaults to `./cache`.                                         |
+| `syncId`    | string |   Yes    | Actual Budget sync ID, found under **Settings → Show advanced settings → Sync ID**.                       |
+| `serverUrl` | URL    |   Yes    | URL of your Actual Budget server.                                                                         |
+| `password`  | string |   Yes    | Actual Budget server password.                                                                            |
+| `notes`     | string |    No    | Notes to add to reconciliation transactions.                                                              |
+| `category`  | string |    No    | Category ID to assign to reconciliation transactions. Use the provided helper script to find category IDs |
 
 ### Accounts
 
